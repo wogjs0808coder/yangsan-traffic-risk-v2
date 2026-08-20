@@ -2,6 +2,7 @@
 
 > V1(정적 배치 파이프라인)의 한계를 넘어, 여러 지역과 실시간 데이터를 다루는 동적 파이프라인으로 재설계하고 있습니다.
 > V1 보러가기: https://github.com/wogjs0808coder/yangsan-traffic-risk
+> V1 서비스 바로가기: https://fragrant-dewberry-0a3.notion.site/3c0294bdb6c580c394e1dfc48ae705a6
 
 ## V1 대비 무엇이 달라지나
 

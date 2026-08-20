@@ -12,7 +12,7 @@ st.write(
     """
 )
 
-st.link_button("V1 바로가기 (완성된 서비스)", "https://yangsan-traffic-risk.streamlit.app")
+st.link_button("V1 바로가기 (완성된 서비스)", "https://fragrant-dewberry-0a3.notion.site/3c0294bdb6c580c394e1dfc48ae705a6")
 st.link_button("V2 GitHub 저장소", "https://github.com/wogjs0808coder/yangsan-traffic-risk-v2")
 
 st.divider()
