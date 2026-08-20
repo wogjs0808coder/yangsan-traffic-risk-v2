@@ -1,0 +1,12 @@
+streamlit
+pandas
+numpy
+xgboost
+scikit-learn
+lightgbm
+shap
+optuna
+folium
+streamlit-folium
+requests
+matplotlib
