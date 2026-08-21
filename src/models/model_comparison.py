@@ -2,13 +2,15 @@
 model_comparison.py
 2주차 산출물 — XGBoost / LightGBM / RandomForest 성능 비교
 
-기존 data_processed/의 X_train, X_test, y_train, y_test를 그대로 사용.
+data_processed/{region}/의 X_train, X_test, y_train, y_test를 사용.
 결과는 표로 출력되고 CSV로도 저장되어 README/대시보드에 바로 붙일 수 있다.
 
 실행:
-    python src/model_comparison.py
+    python src/models/model_comparison.py --region yangsan
+    python src/models/model_comparison.py --region seoul
 """
 
+import argparse
 import time
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
@@ -16,15 +18,13 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 
-DATA_DIR = "data_processed"
-OUTPUT_PATH = "data_processed/model_comparison_result.csv"
 
-
-def load_data():
-    X_train = pd.read_csv(f"{DATA_DIR}/X_train.csv")
-    X_test = pd.read_csv(f"{DATA_DIR}/X_test.csv")
-    y_train = pd.read_csv(f"{DATA_DIR}/y_train.csv").squeeze()
-    y_test = pd.read_csv(f"{DATA_DIR}/y_test.csv").squeeze()
+def load_data(region: str):
+    data_dir = f"data_processed/{region}"
+    X_train = pd.read_csv(f"{data_dir}/X_train.csv")
+    X_test = pd.read_csv(f"{data_dir}/X_test.csv")
+    y_train = pd.read_csv(f"{data_dir}/y_train.csv").squeeze()
+    y_test = pd.read_csv(f"{data_dir}/y_test.csv").squeeze()
     return X_train, X_test, y_train, y_test
 
 
@@ -36,10 +36,10 @@ def get_models():
         ),
         "LightGBM": LGBMClassifier(
             n_estimators=300, max_depth=6, learning_rate=0.1,
-            random_state=42,
+            random_state=42, verbosity=-1,
         ),
         "RandomForest": RandomForestClassifier(
-            n_estimators=300, max_depth=10, random_state=42,
+            n_estimators=300, max_depth=10, random_state=42, n_jobs=-1,
         ),
     }
 
@@ -60,8 +60,10 @@ def evaluate(model, X_train, X_test, y_train, y_test):
     }, confusion_matrix(y_test, pred)
 
 
-def run_comparison():
-    X_train, X_test, y_train, y_test = load_data()
+def run_comparison(region: str):
+    print(f"\n{'='*50}\n[{region}] 모델 비교 시작\n{'='*50}")
+
+    X_train, X_test, y_train, y_test = load_data(region)
     models = get_models()
 
     rows = []
@@ -72,17 +74,22 @@ def run_comparison():
         rows.append(metrics)
         print(f"  → accuracy={metrics['accuracy']}, f1={metrics['f1_weighted']}, "
               f"time={metrics['train_time_sec']}s")
-        print(f"  confusion matrix:\n{cm}\n")
 
     result_df = pd.DataFrame(rows)[["model", "accuracy", "f1_weighted", "train_time_sec"]]
     result_df = result_df.sort_values("f1_weighted", ascending=False)
-    result_df.to_csv(OUTPUT_PATH, index=False, encoding="utf-8-sig")
 
-    print("=== 최종 비교 결과 ===")
+    output_path = f"data_processed/{region}/model_comparison_result.csv"
+    result_df.to_csv(output_path, index=False, encoding="utf-8-sig")
+
+    print(f"\n=== [{region}] 최종 비교 결과 ===")
     print(result_df.to_string(index=False))
-    print(f"\n결과 저장 위치: {OUTPUT_PATH}")
+    print(f"\n결과 저장 위치: {output_path}")
     return result_df
 
 
 if __name__ == "__main__":
-    run_comparison()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--region", required=True, help="예: seoul, busan, daegu, incheon, daejeon, yangsan")
+    args = parser.parse_args()
+
+    run_comparison(args.region)
