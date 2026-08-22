@@ -160,14 +160,3 @@ python src/model_trainer_advanced.py --region daejeon --trials 30
 - `xgboost_tuned_model.json` — 튜닝된 XGBoost 모델 (SHAP 등에 재사용 가능)
 - `training_result_summary.json` — 개별/앙상블 성능 비교 및 최종 추천 모델
 
-## 예상 소요 시간
-
-지역별 데이터 크기와 `--trials` 값에 따라 다르지만, 대략적인 기준:
-- 경남(3,741건), trials=15 → 수 분 내외
-- 서울(100,974건), trials=50 → 데이터량과 5-fold, 3개 모델 탐색이 겹치므로 상당히 오래 걸릴 수 있습니다. 처음엔 `--trials 10` 정도로 짧게 돌려서 코드가 잘 도는지 확인한 뒤 점점 늘리는 걸 추천합니다.
-
-## 흔히 막히는 지점
-
-- **LightGBM `early_stopping` import 에러**: LightGBM 버전이 오래되면 `lgb.early_stopping`이 없을 수 있습니다. `pip install -U lightgbm`으로 업그레이드하세요.
-- **XGBoost `early_stopping_rounds` 위치 에러**: 버전에 따라 생성자 인자가 아니라 `.fit()` 인자로 요구하는 경우가 있습니다 (위 3번 항목 참고).
-- **메모리 부족(특히 서울 데이터)**: `n_jobs=-1`로 되어 있는 RandomForest가 코어를 전부 쓰면서 메모리를 많이 먹을 수 있습니다. 느려도 괜찮다면 `n_jobs=2` 정도로 낮추세요.
